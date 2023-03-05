@@ -9,23 +9,34 @@ const typeDefs = `#graphql
 
   # This "Book" type defines the queryable fields for every book in our data source.
   type Book {
+    id: String
     title: String
     author: String
+  }
+
+  type BookConnection {
+    edges: [BookEdge]
+  }
+
+  type BookEdge {
+    node: Book,
   }
 
   # The "Query" type is special: it lists all of the available queries that
   # clients can execute, along with the return type for each. In this
   # case, the "books" query returns an array of zero or more Books (defined above).
   type Query {
-    books: [Book]
+    books: BookConnection
   }
 `;
 const books = [
   {
+    id: '1',
     title: 'The Awakening',
     author: 'Kate Chopin',
   },
   {
+    id: '2',
     title: 'City of Glass',
     author: 'Paul Auster',
   },
@@ -34,7 +45,9 @@ const books = [
 // This resolver retrieves books from the "books" array above.
 const resolvers = {
   Query: {
-    books: () => books,
+    books: () => ({
+      edges: books.map(node => ({ node }))
+    }),
   },
 };
 // The ApolloServer constructor requires two parameters: your schema
